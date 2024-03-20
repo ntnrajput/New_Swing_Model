@@ -173,9 +173,11 @@ def get_max (reversal_points):
     return df_maximums
 # ------------------------------------------------------------------------------------------------------------------------------------------------
 
-def check_level_crossing(imp_levels_max,current_price,previous_day_price,parso_price,symbol,all_high,ma_20,ma_50,ma_200):
+def check_level_crossing(imp_levels_max,current_price,previous_day_price,parso_price,symbol,all_high,ma_20,ma_50):
     global Stocks
 
+    print('hello')
+    print(current_price)
 
     for i in range (len(imp_levels_max)-1):
       near_high = 0
@@ -191,7 +193,9 @@ def check_level_crossing(imp_levels_max,current_price,previous_day_price,parso_p
 
       if ((previous_day_price <  levels) and (current_price > levels) ) or ((parso_price > previous_day_price) and (previous_day_price < 1.01* levels) and (current_price > levels)):
 
-        print(symbol,' passed zero test with level:', levels)
+        
+        Stocks.append([symbol,"zero check",levels])
+
 
         if(current_price < 1.05 * ma_20 ) and (ma_20 > 1.10 * ma_50) and (levels < 1.01 * ma_20):
             print("1","time to Buy ma 20", symbol, 'for crossing', levels)
@@ -301,10 +305,11 @@ for symbol in nifty_200_symbols:
     # plt.grid(True)
     # plt.show()
 
-    
+    print(symbol)
+
     if current_price > previous_day_price and ma_20 > ma_50 and ma_50 > ma_200 and delta > 0 and current_price > today_3_4 and delta_high > 0 and delta_low > 0:
       
-      check_level_crossing(imp_levels_max,current_price,previous_day_price,parso_price,symbol,all_high,ma_20, ma_50, ma_200)
+      check_level_crossing(imp_levels_max,current_price,previous_day_price,parso_price,symbol,all_high,ma_20, ma_50)
 
 
 Shares = ' & '.join([' '.join(map(str, inner_list)) for inner_list in Stocks])
