@@ -144,34 +144,52 @@ def merge_levels_down(array, tolerance_percentage=2):
             result.append(current_number)
     return result
 # ------------------------------------------------------------------------------------------------------------------------------------------------
-def get_max (reversal_points):
-    # print(reversal_points)
-    first_row = reversal_points.iloc[0]  # First row from slope_change_points
+def get_max (reversal_points, tolerance_percentage = 1 ):
+    all_levels = reversal_points['Close']
+    imp_levels = []
 
-    first_date = first_row['Date']
-    first_close = first_row['ha_Close']
-    first_level = first_row['Close']
+    used_level = set()
 
-    df_maximums=pd.DataFrame({"Date":[first_date],"Maximums":[first_close], "Level":[first_level]})
+    for level in all_levels:
+        if level not in imp_levels:
+            lower_bound = level * (1-(tolerance_percentage/100))  # 1% lower
+            upper_bound = level * (1+(tolerance_percentage/100))
+            filtered_df = reversal_points[(reversal_points['Close'] >= lower_bound) & (reversal_points['Close'] <= upper_bound)]
+            count = len(filtered_df)
+            average_value = filtered_df['Close'].mean()
+            imp_levels.append({'Level': average_value, 'Count': count})
+            used_level.update(filtered_df['Close'])
+    
+    df_level_set1 = pd.DataFrame(imp_levels)
+    print(df_level_set1)
 
-    # Initialize variables for maximum and minimum
+    result_df = df_level_set1.copy()
+    used_values = set()
+    final_levels = []
 
-    for index, row in reversal_points.iterrows():
-        if row['Change'] =="Increased":
-            last_max = df_maximums['Maximums'].iloc[-1]
-            if((row['ha_Close'] > (1.05 * last_max)) or ((row['ha_Close'] < (0.95 * last_max)) ) ):
-                df_maximums.loc[len(df_maximums.index)] = [row['Date'],row['ha_Close'],row['Close']]
-            else:
-                if(row['ha_Close']>last_max):
-                      last_index = df_maximums.index[-1]
-                      df_maximums.iloc[last_index] = [row['Date'], row['ha_Close'], row['Close']]
-                      # df_maximums_new = df_maximums[:-1].copy()
-                      # df_maximums_new.loc[len(df_maximums_new.index)] = [row['Date'],row['Close']]
+    for index, row in result_df.iterrows():
+        if row['Level'] not in used_values:
+            lower_bound = row['Level'] * (1 - (tolerance_percentage / 100))  # 1% lower
+            upper_bound = row['Level'] * (1 + (tolerance_percentage / 100))
+            filtered_df = result_df[(result_df['Level'] >= lower_bound) & (result_df['Level'] <= upper_bound)]
+            count_sum = filtered_df['Count'].sum()
+            average_value = filtered_df['Level'].mean()
+            final_levels.append({'Level': average_value, 'Count': count_sum})
+            result_df.loc[index, 'Sum_Count'] = count_sum
+            used_level.update(filtered_df['Level'])
+
+    df_maximums = pd.DataFrame(final_levels)
+    print(df_maximums)
+    return df_maximums
+    
+    
+    
+
 
     return df_maximums
 # ------------------------------------------------------------------------------------------------------------------------------------------------
 def check_level_1(symbol, parso_price, previous_day_price, current_price, ma_20, ma_50, ma_200, delta, delta_high, delta_low, today_3_4, imp_levels_max):
-    print(symbol)
+    print(symbol, imp_levels_max)
     if current_price > previous_day_price and ma_20 > ma_50 and ma_50 > ma_200 and delta > 0 and current_price > today_3_4 and delta_high > 0 and delta_low > 0:
       print('passed level 1')
       check_level_crossing(imp_levels_max,current_price,previous_day_price,parso_price,symbol,all_high,ma_20, ma_50, ma_200)
@@ -213,8 +231,8 @@ def check_level_crossing(imp_levels_max,current_price,previous_day_price,parso_p
             print(imp_levels_max)
             Stocks.append([symbol,levels])
 # ------------------------------------------------------------------------------------------------------------------------------------------------
-nifty_200_symbols = stock_symbols()
-# nifty_200_symbols = ['BAJAJ-AUTO.NS','ITC.NS','RITES.NS']
+# nifty_200_symbols = stock_symbols()
+nifty_200_symbols = ['COALINDIA.NS']
 # ------------------------------------------------------------------------------------------------------------------------------------------------
 # Specify the date range for the historical data (5 years ago from today)
 end_date = datetime.today().strftime('%Y-%m-%d')
@@ -302,4 +320,4 @@ for symbol in nifty_200_symbols:
     check_level_1(symbol, parso_price, previous_day_price, current_price, ma_20, ma_50, ma_200, delta, delta_high, delta_low, today_3_4, imp_levels_max)
     
 Shares = ' & '.join([' '.join(map(str, inner_list)) for inner_list in Stocks])
-send_email('Swing Tip', Shares)
+# send_email('Swing Tip', Shares)
