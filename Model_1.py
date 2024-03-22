@@ -1,6 +1,8 @@
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+import warnings
+warnings.filterwarnings("ignore", message="The 'unit' keyword in TimedeltaIndex construction is deprecated.*")
 import yfinance as yf
 import pandas as pd
 import numpy as np
@@ -80,7 +82,6 @@ def stock_symbols():
     #                      'IOC.NS','LTIM.NS','TATASTEEL.NS','SIEMENS.NS','SBILIFE.NS','GRASIM.NS','PIDILITIND.NS','BEL.NS','HINDZINC.NS']  # Repl
     
     return nifty_200_symbols
-
 Stocks = []
 # ------------------------------------------------------------------------------------------------------------------------------------------------
 def send_email(subject, body):
@@ -112,8 +113,7 @@ def send_email(subject, body):
     except Exception as e:
         print(f"Error sending email: {e}")
 # ------------------------------------------------------------------------------------------------------------------------------------------------
-
-def merge_levels_up(array, tolerance_percentage=3):
+def merge_levels_up(array, tolerance_percentage=2):
     array = array.to_numpy()
     sorted_array = sorted(array)
     sorted_array.sort(reverse=True)
@@ -128,8 +128,7 @@ def merge_levels_up(array, tolerance_percentage=3):
             result.append(current_number)
     return result
 # ------------------------------------------------------------------------------------------------------------------------------------------------
-
-def merge_levels_down(array, tolerance_percentage=5):
+def merge_levels_down(array, tolerance_percentage=2):
 
     array = array.to_numpy()
     sorted_array = sorted(array)
@@ -145,7 +144,6 @@ def merge_levels_down(array, tolerance_percentage=5):
             result.append(current_number)
     return result
 # ------------------------------------------------------------------------------------------------------------------------------------------------
-
 def get_max (reversal_points):
     # print(reversal_points)
     first_row = reversal_points.iloc[0]  # First row from slope_change_points
@@ -172,7 +170,12 @@ def get_max (reversal_points):
 
     return df_maximums
 # ------------------------------------------------------------------------------------------------------------------------------------------------
-
+def check_level_1(symbol, parso_price, previous_day_price, current_price, ma_20, ma_50, ma_200, delta, delta_high, delta_low, today_3_4, imp_levels_max):
+    print(symbol)
+    if current_price > previous_day_price and ma_20 > ma_50 and ma_50 > ma_200 and delta > 0 and current_price > today_3_4 and delta_high > 0 and delta_low > 0:
+      print('passed level 1')
+      check_level_crossing(imp_levels_max,current_price,previous_day_price,parso_price,symbol,all_high,ma_20, ma_50, ma_200)
+# ------------------------------------------------------------------------------------------------------------------------------------------------
 def check_level_crossing(imp_levels_max,current_price,previous_day_price,parso_price,symbol,all_high,ma_20,ma_50,ma_200):
     global Stocks
 
@@ -210,20 +213,16 @@ def check_level_crossing(imp_levels_max,current_price,previous_day_price,parso_p
             print(imp_levels_max)
             Stocks.append([symbol,levels])
 # ------------------------------------------------------------------------------------------------------------------------------------------------
-
-
 nifty_200_symbols = stock_symbols()
 # nifty_200_symbols = ['BAJAJ-AUTO.NS','ITC.NS','RITES.NS']
-
-
+# ------------------------------------------------------------------------------------------------------------------------------------------------
 # Specify the date range for the historical data (5 years ago from today)
 end_date = datetime.today().strftime('%Y-%m-%d')
 start_date = (datetime.today() - timedelta(days=5*365)).strftime('%Y-%m-%d')
-
 # Create an empty DataFrame to store the data
 nifty_200_data = pd.DataFrame()
-
 # Fetch historical data for each stock and making data frame (Multiple Rows---> Row 1 to 500 : Stock1, Row 501 to 1000 : Stock 2 .... So on)
+# ------------------------------------------------------------------------------------------------------------------------------------------------
 for symbol in nifty_200_symbols:
     try:
         stock_data = yf.download(symbol, start=start_date, end=end_date)
@@ -233,7 +232,6 @@ for symbol in nifty_200_symbols:
         nifty_200_data = pd.concat([nifty_200_data, stock_data])
     except Exception as e:
         print(f"Error fetching data for {symbol}: {e}")
-
 
 for symbol in nifty_200_symbols:
     itc_data = nifty_200_data[nifty_200_data['Symbol'] == symbol]
@@ -301,11 +299,7 @@ for symbol in nifty_200_symbols:
     # plt.grid(True)
     # plt.show()
 
+    check_level_1(symbol, parso_price, previous_day_price, current_price, ma_20, ma_50, ma_200, delta, delta_high, delta_low, today_3_4, imp_levels_max)
     
-    if current_price > previous_day_price and ma_20 > ma_50 and ma_50 > ma_200 and delta > 0 and current_price > today_3_4 and delta_high > 0 and delta_low > 0:
-      
-      check_level_crossing(imp_levels_max,current_price,previous_day_price,parso_price,symbol,all_high,ma_20, ma_50, ma_200)
-
-
 Shares = ' & '.join([' '.join(map(str, inner_list)) for inner_list in Stocks])
 send_email('Swing Tip', Shares)
