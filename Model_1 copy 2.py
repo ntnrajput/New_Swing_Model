@@ -269,30 +269,27 @@ for symbol in nifty_200_symbols:
     ma_50= itc_data['Close'].tail(50).mean()
     ma_200 = itc_data['Close'].tail(200).mean()
 
-    itc_data = itc_data.copy()
+    Week_Stock = itc_data.copy()
 
-    itc_data['ha_Close'] = (itc_data['Open'] + itc_data['High'] + itc_data['Low'] + itc_data['Close'])/4
+    Week_Stock['Date'] = pd.to_datetime(Week_Stock['Date'])
+    Week_Stock.set_index('Date', inplace=True)
+    W_S_Grouped = Week_Stock.groupby('Symbol').resample('W')
+    weekly_data = W_S_Grouped.agg({ 'Open': 'first','Close': 'last', 'High': 'max','Low': 'min'}).reset_index()
+    weekly_data.columns = ['stock_symbol', 'Date', 'open_price_week', 'Close', 'high_price_week', 'low_price_week']
 
-    # itc_data ['Change'] = itc_data['ha_Close'].diff().apply(lambda x: 'Increased' if x > 0 else 'Decreased')
-    itc_data = itc_data.copy()
-    itc_data.loc[:, 'Change'] = itc_data['ha_Close'].diff().apply(lambda x: 'Increased' if x > 0 else 'Decreased')
-
-
-    itc_data['Sign Change'] = itc_data['Change'] != itc_data['Change'].shift(1)
-
-    
-    slope_change_points = itc_data[itc_data['Sign Change']]
-    rows_with_sign_change = itc_data[itc_data['Sign Change']].index.to_numpy()
-    rows_with_sign_change[1:] -= 1
-    reversal_points = itc_data.iloc[rows_with_sign_change]
+    weekly_data['ha_Close'] = (weekly_data['open_price_week'] + weekly_data['high_price_week'] + weekly_data['low_price_week'] + weekly_data['Close']) / 4
+    weekly_data['Change'] = weekly_data['ha_Close'].diff().apply(lambda x: 'Increased' if x > 0 else 'Decreased')
+    weekly_data['Sign Change'] = weekly_data['Change'] != weekly_data['Change'].shift(1)
+    W_slope_change_points = weekly_data[weekly_data['Sign Change']]
+    W_rows_with_sign_change = weekly_data[weekly_data['Sign Change']].index.to_numpy()
+    W_rows_with_sign_change[1:] -= 1
+    W_reversal_points = weekly_data.iloc[W_rows_with_sign_change]
+    # print(weekly_data)
 
     delta = current_price - open_price
 
-    
-
-    reversal_points = itc_data.iloc[rows_with_sign_change]
-    
-
+    reversal_points = weekly_data.iloc[W_rows_with_sign_change]
+    print(reversal_points)
     df_maximums = get_max(reversal_points)
     
     imp_levels_max = merge_levels_up(df_maximums['Level'])
