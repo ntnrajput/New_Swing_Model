@@ -230,7 +230,7 @@ def check_level_crossing(imp_levels_max,current_price,previous_day_price,parso_p
             Stocks.append([symbol,levels])
 # ------------------------------------------------------------------------------------------------------------------------------------------------
 # nifty_200_symbols = stock_symbols()
-nifty_200_symbols = ['COALINDIA.NS']
+nifty_200_symbols = ['COALINDIA.NS','RITES.NS']
 # ------------------------------------------------------------------------------------------------------------------------------------------------
 # Specify the date range for the historical data (5 years ago from today)
 end_date = datetime.today().strftime('%Y-%m-%d')

@@ -181,7 +181,7 @@ def get_max (reversal_points, tolerance_percentage = 1 ):
             used_values.update(filtered_df['Level'])
 
     df_maximums = pd.DataFrame(final_levels)
-    print(df_maximums)
+    
     return df_maximums
        
     return df_maximums
@@ -229,8 +229,9 @@ def check_level_crossing(imp_levels_max,current_price,previous_day_price,parso_p
             print(imp_levels_max)
             Stocks.append([symbol,levels])
 # ------------------------------------------------------------------------------------------------------------------------------------------------
-# nifty_200_symbols = stock_symbols()
-nifty_200_symbols = ['COALINDIA.NS']
+# nifty_200_symbols = stock_symbols()cls
+
+nifty_200_symbols = ['COALINDIA.NS','RITES.NS']
 # ------------------------------------------------------------------------------------------------------------------------------------------------
 # Specify the date range for the historical data (5 years ago from today)
 end_date = datetime.today().strftime('%Y-%m-%d')
@@ -297,7 +298,7 @@ for symbol in nifty_200_symbols:
     
     imp_levels_max = merge_levels_up(df_maximums['Level'])
 
-    print(imp_levels_max)
+    # print(imp_levels_max)
 
     # plt.figure(figsize=(10, 6))
     # # plt.plot(df_maximums['Date'], df_maximums['Maximums'], marker='o', label='Maximums')
