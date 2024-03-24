@@ -181,7 +181,7 @@ def get_max (reversal_points, tolerance_percentage = 1 ):
             used_values.update(filtered_df['Level'])
 
     df_maximums = pd.DataFrame(final_levels)
-    
+    print(df_maximums)
     return df_maximums
        
     return df_maximums
@@ -210,12 +210,8 @@ def check_level_crossing(imp_levels_max,current_price,previous_day_price,parso_p
 
       if ((previous_day_price <  levels) and (current_price > levels) ) or ((parso_price > previous_day_price) and (previous_day_price < 1.01* levels) and (current_price > levels)):
 
-<<<<<<< HEAD
-        
-=======
        
 
->>>>>>> 559483de442133cb0a6e127e8e0db029b940774d
         if(current_price < 1.05 * ma_20 ) and (ma_20 > 1.10 * ma_50) and (levels < 1.01 * ma_20):
             print("1","time to Buy ma 20", symbol, 'for crossing', levels)
             print('symbol',symbol,parso_price,previous_day_price,current_price)
@@ -224,27 +220,18 @@ def check_level_crossing(imp_levels_max,current_price,previous_day_price,parso_p
 
         if (near_high == 1) and (current_price < 1.02 * levels) and (all_high > 1.09  * current_price)  :
             print(all_high)
-            print("2","time to Buy  near high", symbol, 'for crossing', levels , 'next level:',nxt_level , 'prev level:',lower_level)
+            print("2","time to Buy  near high", symbol, 'for crossing', levels)
             print(imp_levels_max)
             Stocks.append([symbol,"High",levels])
 
         if (near_high == 0 ) and (nxt_level > 1.07*levels) and (lower_level > 0.95 * levels) and (nxt_level > 1.05 * current_price):
-            print("3","time to Buy", symbol, 'for crossing', levels, 'next level:',nxt_level , 'prev level:',lower_level)
+            print("3","time to Buy", symbol, 'for crossing', levels, 'next level:',nxt_level)
             print(imp_levels_max)
             Stocks.append([symbol,levels])
 # ------------------------------------------------------------------------------------------------------------------------------------------------
-# nifty_200_symbols = stock_symbols()cls
-
-<<<<<<< HEAD
-
 # nifty_200_symbols = stock_symbols()
-nifty_200_symbols = ['MGL.BO']
-
-
-=======
 nifty_200_symbols = ['COALINDIA.NS','RITES.NS']
 # ------------------------------------------------------------------------------------------------------------------------------------------------
->>>>>>> 559483de442133cb0a6e127e8e0db029b940774d
 # Specify the date range for the historical data (5 years ago from today)
 end_date = datetime.today().strftime('%Y-%m-%d')
 start_date = (datetime.today() - timedelta(days=5*365)).strftime('%Y-%m-%d')
@@ -282,43 +269,32 @@ for symbol in nifty_200_symbols:
     ma_50= itc_data['Close'].tail(50).mean()
     ma_200 = itc_data['Close'].tail(200).mean()
 
-    itc_data = itc_data.copy()
+    Week_Stock = itc_data.copy()
 
-    itc_data['ha_Close'] = (itc_data['Open'] + itc_data['High'] + itc_data['Low'] + itc_data['Close'])/4
+    Week_Stock['Date'] = pd.to_datetime(Week_Stock['Date'])
+    Week_Stock.set_index('Date', inplace=True)
+    W_S_Grouped = Week_Stock.groupby('Symbol').resample('W')
+    weekly_data = W_S_Grouped.agg({ 'Open': 'first','Close': 'last', 'High': 'max','Low': 'min'}).reset_index()
+    weekly_data.columns = ['stock_symbol', 'Date', 'open_price_week', 'Close', 'high_price_week', 'low_price_week']
 
-    # itc_data ['Change'] = itc_data['ha_Close'].diff().apply(lambda x: 'Increased' if x > 0 else 'Decreased')
-    itc_data = itc_data.copy()
-    itc_data.loc[:, 'Change'] = itc_data['ha_Close'].diff().apply(lambda x: 'Increased' if x > 0 else 'Decreased')
-
-
-    itc_data['Sign Change'] = itc_data['Change'] != itc_data['Change'].shift(1)
-
-    
-    slope_change_points = itc_data[itc_data['Sign Change']]
-    rows_with_sign_change = itc_data[itc_data['Sign Change']].index.to_numpy()
-    rows_with_sign_change[1:] -= 1
-    reversal_points = itc_data.iloc[rows_with_sign_change]
+    weekly_data['ha_Close'] = (weekly_data['open_price_week'] + weekly_data['high_price_week'] + weekly_data['low_price_week'] + weekly_data['Close']) / 4
+    weekly_data['Change'] = weekly_data['ha_Close'].diff().apply(lambda x: 'Increased' if x > 0 else 'Decreased')
+    weekly_data['Sign Change'] = weekly_data['Change'] != weekly_data['Change'].shift(1)
+    W_slope_change_points = weekly_data[weekly_data['Sign Change']]
+    W_rows_with_sign_change = weekly_data[weekly_data['Sign Change']].index.to_numpy()
+    W_rows_with_sign_change[1:] -= 1
+    W_reversal_points = weekly_data.iloc[W_rows_with_sign_change]
+    # print(weekly_data)
 
     delta = current_price - open_price
 
-    
-
-    reversal_points = itc_data.iloc[rows_with_sign_change]
-    
-    print('reversal',reversal_points)
+    reversal_points = weekly_data.iloc[W_rows_with_sign_change]
+    print(reversal_points)
     df_maximums = get_max(reversal_points)
-    print('df_max',df_maximums)
+    
     imp_levels_max = merge_levels_up(df_maximums['Level'])
-<<<<<<< HEAD
-    print('imp-vel',imp_levels_max)
 
-    # imp_levels_max = merge_levels_up(df_maximums['Maximums'])
-    # imp_levels_min = merge_levels_down(df_minimums['Minimums'])
-
-=======
-
-    # print(imp_levels_max)
->>>>>>> 559483de442133cb0a6e127e8e0db029b940774d
+    print(imp_levels_max)
 
     # plt.figure(figsize=(10, 6))
     # # plt.plot(df_maximums['Date'], df_maximums['Maximums'], marker='o', label='Maximums')
