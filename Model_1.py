@@ -1,3 +1,4 @@
+
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -112,6 +113,25 @@ def send_email(subject, body):
         print("Email sent successfully!")
     except Exception as e:
         print(f"Error sending email: {e}")
+# -------------------------------------------
+def check_sign_change(row):
+
+    
+    if row['Sign Change Initial'] == True:
+        
+        # if row['Change'] == 'Decreased' and row['Low_Diff'] == 'Decreased' and row['High_Diff'] == 'Decreased' and row['Change_Count_Check'] == True  :
+        if row['Change'] == 'Decreased'  and row['Change_Count_Check'] == True  :
+            
+            return True
+        # elif row['Change'] == 'Increased' and row['Low_Diff'] == 'Increased' and row['High_Diff'] == 'Increased' and row['Change_Count_Check'] == True :
+        elif row['Change'] == 'Increased' and row['Change_Count_Check'] == True :
+            return True
+        else:
+            return False
+        
+    else:
+        
+        return False
 # ------------------------------------------------------------------------------------------------------------------------------------------------
 def merge_levels_up(array, tolerance_percentage=2):
     array = array.to_numpy()
@@ -210,12 +230,8 @@ def check_level_crossing(imp_levels_max,current_price,previous_day_price,parso_p
 
       if ((previous_day_price <  levels) and (current_price > levels) ) or ((parso_price > previous_day_price) and (previous_day_price < 1.01* levels) and (current_price > levels)):
 
-<<<<<<< HEAD
-        
-=======
        
 
->>>>>>> 559483de442133cb0a6e127e8e0db029b940774d
         if(current_price < 1.05 * ma_20 ) and (ma_20 > 1.10 * ma_50) and (levels < 1.01 * ma_20):
             print("1","time to Buy ma 20", symbol, 'for crossing', levels)
             print('symbol',symbol,parso_price,previous_day_price,current_price)
@@ -224,27 +240,19 @@ def check_level_crossing(imp_levels_max,current_price,previous_day_price,parso_p
 
         if (near_high == 1) and (current_price < 1.02 * levels) and (all_high > 1.09  * current_price)  :
             print(all_high)
-            print("2","time to Buy  near high", symbol, 'for crossing', levels , 'next level:',nxt_level , 'prev level:',lower_level)
+            print("2","time to Buy  near high", symbol, 'for crossing', levels)
             print(imp_levels_max)
             Stocks.append([symbol,"High",levels])
 
         if (near_high == 0 ) and (nxt_level > 1.07*levels) and (lower_level > 0.95 * levels) and (nxt_level > 1.05 * current_price):
-            print("3","time to Buy", symbol, 'for crossing', levels, 'next level:',nxt_level , 'prev level:',lower_level)
+            print("3","time to Buy", symbol, 'for crossing', levels, 'next level:',nxt_level)
             print(imp_levels_max)
             Stocks.append([symbol,levels])
 # ------------------------------------------------------------------------------------------------------------------------------------------------
-# nifty_200_symbols = stock_symbols()cls
+nifty_200_symbols = stock_symbols()cls
 
-<<<<<<< HEAD
-
-# nifty_200_symbols = stock_symbols()
-nifty_200_symbols = ['MGL.BO']
-
-
-=======
-nifty_200_symbols = ['COALINDIA.NS','RITES.NS']
+# nifty_200_symbols = ['LT.NS']
 # ------------------------------------------------------------------------------------------------------------------------------------------------
->>>>>>> 559483de442133cb0a6e127e8e0db029b940774d
 # Specify the date range for the historical data (5 years ago from today)
 end_date = datetime.today().strftime('%Y-%m-%d')
 start_date = (datetime.today() - timedelta(days=5*365)).strftime('%Y-%m-%d')
@@ -285,40 +293,100 @@ for symbol in nifty_200_symbols:
     itc_data = itc_data.copy()
 
     itc_data['ha_Close'] = (itc_data['Open'] + itc_data['High'] + itc_data['Low'] + itc_data['Close'])/4
+    itc_data['ha_Open'] = (itc_data['Open'].shift(1) + itc_data['Close'].shift(1)) / 2  
+    itc_data['ha_High'] = itc_data[['ha_Open', 'ha_Close', 'High']].max(axis=1)
+    itc_data['ha_Low'] = itc_data[['ha_Open', 'ha_Close', 'Low']].min(axis=1)
 
-    # itc_data ['Change'] = itc_data['ha_Close'].diff().apply(lambda x: 'Increased' if x > 0 else 'Decreased')
+     
     itc_data = itc_data.copy()
     itc_data.loc[:, 'Change'] = itc_data['ha_Close'].diff().apply(lambda x: 'Increased' if x > 0 else 'Decreased')
 
+    change_count = 1  # Initialize change count
+    change_counts = []  # List to store change counts
+    
+    
 
-    itc_data['Sign Change'] = itc_data['Change'] != itc_data['Change'].shift(1)
+    for i in range(len(itc_data)):
+        if i == 0:
+            # For the first row, append 1 regardless of the change
+            change_counts.append(change_count)
+        else:
+            # Check if the current change is the same as the previous one
+            if itc_data['Change'].iloc[i] == itc_data['Change'].iloc[i - 1]:
+                # If it is the same, increment the change count
+                change_count += 1
+            else:
+                # If it is different, reset the change count to 1
+                change_count = 1
+            # Append the current change count to the list
+            change_counts.append(change_count)
+
+    itc_data['Change_Count'] = change_counts
+
+
+    change_count_checks = []  # Initialize list for Change_Count_Check column
+
+    for i in range(len(itc_data)):
+        if i == 0 or i == len(itc_data) - 1:
+            # For the first and last rows, append False as there's no previous or next row
+            change_count_checks.append(False)
+        else:
+            # Check if the previous and next change counts are greater than 1
+            prev_count = change_counts[i - 1]
+            next_count = change_counts[i + 1]
+            if prev_count > 1 and next_count > 1:
+                change_count_checks.append(True)
+            else:
+                change_count_checks.append(False)
+
+    # Assign the list as a new column 'Change_Count_Check'
+    itc_data['Change_Count_Check'] = change_count_checks
+
 
     
+
+    # print(itc_data.tail(50))
+
+    itc_data['Sign Change Initial'] = itc_data['Change'] != itc_data['Change'].shift(1)
+
+    itc_data['High_Diff'] = itc_data['High'].diff()
+    itc_data['High_Diff'] = itc_data['High_Diff'].apply(lambda x: 'Increased' if x > 0 else 'Decreased')
+
+    # Calculate Low_Diff column
+    itc_data['Low_Diff'] = itc_data['Low'].diff()
+    itc_data['Low_Diff'] = itc_data['Low_Diff'].apply(lambda x: 'Increased' if x > 0 else 'Decreased')
+
+    # Calculate Candle Color column
+    itc_data['Candle_Color'] = np.where(itc_data['Open'] - itc_data['Close'] < 0, 'Green', 'Red')
+    itc_data['ha_Candle_Color'] = np.where(itc_data['ha_Open'] - itc_data['ha_Close'] < 0, 'Green', 'Red')
+
+  
+
+    itc_data['Sign Change'] = itc_data.apply(lambda row: check_sign_change(row), axis=1)
+
+    pd.set_option('display.max_rows', None)
+    # pd.set_option('display.max_columns', None)
+      
     slope_change_points = itc_data[itc_data['Sign Change']]
+    
     rows_with_sign_change = itc_data[itc_data['Sign Change']].index.to_numpy()
     rows_with_sign_change[1:] -= 1
     reversal_points = itc_data.iloc[rows_with_sign_change]
 
-    delta = current_price - open_price
+    selected_columns_indices = [ 1,2,3,4,5,6,7,8,9,10,11,12,13]  # Replace with the indices of the columns you want to select
+    # print(reversal_points.iloc[:, selected_columns_indices].tail(30))
 
-    
+   
+
+    delta = current_price - open_price
 
     reversal_points = itc_data.iloc[rows_with_sign_change]
     
-    print('reversal',reversal_points)
     df_maximums = get_max(reversal_points)
-    print('df_max',df_maximums)
+    
     imp_levels_max = merge_levels_up(df_maximums['Level'])
-<<<<<<< HEAD
-    print('imp-vel',imp_levels_max)
-
-    # imp_levels_max = merge_levels_up(df_maximums['Maximums'])
-    # imp_levels_min = merge_levels_down(df_minimums['Minimums'])
-
-=======
 
     # print(imp_levels_max)
->>>>>>> 559483de442133cb0a6e127e8e0db029b940774d
 
     # plt.figure(figsize=(10, 6))
     # # plt.plot(df_maximums['Date'], df_maximums['Maximums'], marker='o', label='Maximums')
