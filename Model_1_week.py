@@ -186,7 +186,8 @@ def get_min (reversal_points):
 
 def check_level_crossing(imp_levels_max,current_price,previous_day_price,parso_price,symbol,all_high,ma_20,ma_50):
     global Stocks
-
+    print(imp_levels_max)
+    
     for i in range (len(imp_levels_max)-1):
       near_high = 0
       levels = imp_levels_max[i]
@@ -199,7 +200,7 @@ def check_level_crossing(imp_levels_max,current_price,previous_day_price,parso_p
         lower_level = imp_levels_max[i+1]
 
       if ((previous_day_price <  levels) and (current_price > levels) ) or ((parso_price > previous_day_price) and (previous_day_price < 1.01* levels) and (current_price > levels)):
-
+       
         if(current_price < 1.05 * ma_20 ) and (ma_20 > 1.10 * ma_50) and (levels < 1.01 * ma_20):
             print("1","time to Buy ma 20", symbol, 'for crossing', levels)
             print('symbol',symbol,parso_price,previous_day_price,current_price)
@@ -223,7 +224,7 @@ def check_level_crossing(imp_levels_max,current_price,previous_day_price,parso_p
 
 
 # nifty_200_symbols = stock_symbols()
-nifty_200_symbols = ['BAJAJ-AUTO.NS','ITC.NS','RITES.NS']
+nifty_200_symbols = ['BAJAJ-AUTO.NS','ITC.NS','RITES.NS','MGL.BO']
 print(nifty_200_symbols)
 
 # Specify the date range for the historical data (5 years ago from today)
@@ -311,7 +312,7 @@ for symbol in nifty_200_symbols:
 
 
 
-    if current_price > previous_day_price and current_price > ma_20 and ma_20 > ma_50 and delta > 0 and current_price>today_3_4 and delta_high > 0 and delta_low > 0:
+    if current_price > previous_day_price and ma_20 > ma_50 and delta > 0 and current_price>today_3_4 and delta_high > 0 and delta_low > 0:
       check_level_crossing(imp_levels_max,current_price,previous_day_price,parso_price,symbol,all_high,ma_20, ma_50)
 
 
