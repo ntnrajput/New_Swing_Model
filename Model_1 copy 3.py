@@ -202,45 +202,6 @@ def check_level_1(symbol, parso_price, previous_day_price, current_price, ma_20,
       
       check_level_crossing(imp_levels_max,current_price,previous_day_price,parso_price,symbol,all_high,ma_20, ma_50, ma_200)
 # ------------------------------------------------------------------------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------------------------------------------------------------------------
-# nifty_200_symbols = stock_symbols()
-
-def calculate_change_counts(data):
-    change_counts = [1]  # Initialize change count
-    for i in range(1, len(data)):
-        if data['Change'].iloc[i] == data['Change'].iloc[i - 1]:
-            change_counts.append(change_counts[-1] + 1)
-        else:
-            change_counts.append(1)
-    return change_counts
-
-def calculate_change_count_checks(change_counts):
-    change_count_checks = [False]  # Initialize list for Change_Count_Check column
-    for i in range(1, len(change_counts) - 1):
-        if change_counts[i - 1] > 1 and change_counts[i + 1] > 1:
-            change_count_checks.append(True)
-        else:
-            change_count_checks.append(False)
-    change_count_checks.append(False)
-    return change_count_checks
-
-
-
-def check_pass_zero(share_history, stock_data):
-    current_price = share_history['Close'].iloc[-1]
-    open_price = share_history['Open'].iloc[-1]
-    previous_day_price = share_history['Close'].iloc[-2]
-    parso_price = share_history['Close'].iloc[-3]
-    all_high = max(stock_data['Close'])
-
-    delta_high = (share_history['High'].iloc[-1])-(share_history['High'].iloc[-2]) #difference between high of today and yesterday
-    delta_low = (share_history['Low'].iloc[-1])-(share_history['Low'].iloc[-2]) #difference between lows of today and yesterday
-    today_3_4 = (share_history['Low'].iloc[-1]) + (0.75* (share_history['High'].iloc[-1]  - share_history['Low'].iloc[-1]))  # 3/4 th of the todays low
-
-    
-    if(current_price > today_3_4 and delta_high > 0 and delta_low > 0 ):
-        check_level_1(symbol, parso_price, previous_day_price, current_price, ma_20, ma_50, ma_200, delta_today, delta_high, delta_low, today_3_4, imp_levels_max)
-
 def check_level_crossing(imp_levels_max,current_price,previous_day_price,parso_price,symbol,all_high,ma_20,ma_50,ma_200):
     global Stocks
 
@@ -277,12 +238,28 @@ def check_level_crossing(imp_levels_max,current_price,previous_day_price,parso_p
             print("3","time to Buy", symbol, 'for crossing', levels, 'next level:',nxt_level)
             print(imp_levels_max)
             Stocks.append([symbol,levels])
-
-
-
-
-    
+# ------------------------------------------------------------------------------------------------------------------------------------------------
 # nifty_200_symbols = stock_symbols()
+
+def calculate_change_counts(data):
+    change_counts = [1]  # Initialize change count
+    for i in range(1, len(data)):
+        if data['Change'].iloc[i] == data['Change'].iloc[i - 1]:
+            change_counts.append(change_counts[-1] + 1)
+        else:
+            change_counts.append(1)
+    return change_counts
+
+def calculate_change_count_checks(change_counts):
+    change_count_checks = [False]  # Initialize list for Change_Count_Check column
+    for i in range(1, len(change_counts) - 1):
+        if change_counts[i - 1] > 1 and change_counts[i + 1] > 1:
+            change_count_checks.append(True)
+        else:
+            change_count_checks.append(False)
+    change_count_checks.append(False)
+    return change_count_checks
+
 nifty_200_symbols = ['LT.NS']
 # ------------------------------------------------------------------------------------------------------------------------------------------------
 # Specify the date range for the historical data (5 years ago from today)
@@ -303,59 +280,96 @@ for symbol in nifty_200_symbols:
         print(f"Error fetching data for {symbol}: {e}")
 
 for symbol in nifty_200_symbols:
-    stock_data = nifty_200_data[nifty_200_data['Symbol'] == symbol]
-    stock_data['ha_Close'] = (stock_data['Open'] + stock_data['High'] + stock_data['Low'] + stock_data['Close'])/4
-    stock_data['ha_Open'] = (stock_data['Open'].shift(1) + stock_data['Close'].shift(1)) / 2  
-    stock_data['ha_High'] = stock_data[['ha_Open', 'ha_Close', 'High']].max(axis=1)
-    stock_data['ha_Low'] = stock_data[['ha_Open', 'ha_Close', 'Low']].min(axis=1)
-    stock_data['Change'] = np.where(stock_data['ha_Close'].diff() > 0, 'Increased', 'Decreased')
-    stock_data['Change_Count'] = calculate_change_counts(stock_data)
-    stock_data['Change_Count_Check'] = calculate_change_count_checks(stock_data['Change_Count'])
-    stock_data['Sign Change Initial'] = stock_data['Change'] != stock_data['Change'].shift(1)
-    stock_data['Candle_Color'] = np.where(stock_data['Open'] - stock_data['Close'] < 0, 'Green', 'Red')  
-    stock_data['Sign Change'] = stock_data.apply(lambda row: check_sign_change(row), axis=1)
-
-    ma_20= stock_data['Close'].tail(20).mean()
-    ma_50= stock_data['Close'].tail(50).mean()
-    ma_200 = stock_data['Close'].tail(200).mean()
-
-    slope_change_points = stock_data[stock_data['Sign Change']]    
-    rows_with_sign_change = stock_data[stock_data['Sign Change']].index.to_numpy()
-    rows_with_sign_change[1:] -= 1
-    reversal_points = stock_data.iloc[rows_with_sign_change]
-    df_maximums = get_max(reversal_points)    
-    imp_levels_max = merge_levels_up(df_maximums['Level'])
-
+    itc_data = nifty_200_data[nifty_200_data['Symbol'] == symbol]
     share_details = yf.Ticker(symbol)
     share_history = share_details.history()
-    delta_today = share_history['Close'].iloc[-1] - share_history['Open'].iloc[-1]
+
+    current_price = share_history['Close'].iloc[-1]
+    open_price = share_history['Open'].iloc[-1]
+    previous_day_price = share_history['Close'].iloc[-2]
+    parso_price = share_history['Close'].iloc[-3]
+    all_high = max(itc_data['Close'])
+
+    delta_high = (share_history['High'].iloc[-1])-(share_history['High'].iloc[-2]) #difference between high of today and yesterday
+    delta_low = (share_history['Low'].iloc[-1])-(share_history['Low'].iloc[-2]) #difference between lows of today and yesterday
+
+    today_3_4 = (share_history['Low'].iloc[-1]) + (0.75* (share_history['High'].iloc[-1]  - share_history['Low'].iloc[-1]))  # 3/4 th of the todays low
+
+    ma_20= itc_data['Close'].tail(20).mean()
+    ma_50= itc_data['Close'].tail(50).mean()
+    ma_200 = itc_data['Close'].tail(200).mean()
+
+    itc_data = itc_data.copy()
+
+    itc_data['ha_Close'] = (itc_data['Open'] + itc_data['High'] + itc_data['Low'] + itc_data['Close'])/4
+    itc_data['ha_Open'] = (itc_data['Open'].shift(1) + itc_data['Close'].shift(1)) / 2  
+    itc_data['ha_High'] = itc_data[['ha_Open', 'ha_Close', 'High']].max(axis=1)
+    itc_data['ha_Low'] = itc_data[['ha_Open', 'ha_Close', 'Low']].min(axis=1)
+
+
+    itc_data['Change'] = np.where(itc_data['ha_Close'].diff() > 0, 'Increased', 'Decreased')
     
-    if(ma_20 > ma_50 and ma_50 > ma_200 and delta_today > 0 ):
-        check_pass_zero(share_history,stock_data)
+    itc_data['Change_Count'] = calculate_change_counts(itc_data)
+    itc_data['Change_Count_Check'] = calculate_change_count_checks(itc_data['Change_Count'])
 
+    # print(itc_data.tail(50))
 
+    itc_data['Sign Change Initial'] = itc_data['Change'] != itc_data['Change'].shift(1)
 
+    itc_data['High_Diff'] = itc_data['High'].diff()
+    itc_data['High_Diff'] = itc_data['High_Diff'].apply(lambda x: 'Increased' if x > 0 else 'Decreased')
 
+    # Calculate Low_Diff column
+    itc_data['Low_Diff'] = itc_data['Low'].diff()
+    itc_data['Low_Diff'] = itc_data['Low_Diff'].apply(lambda x: 'Increased' if x > 0 else 'Decreased')
 
-
-
-
-    # print(stock_data)
-    
-
-
-
-
-    
+    # Calculate Candle Color column
+    itc_data['Candle_Color'] = np.where(itc_data['Open'] - itc_data['Close'] < 0, 'Green', 'Red')
+    itc_data['ha_Candle_Color'] = np.where(itc_data['ha_Open'] - itc_data['ha_Close'] < 0, 'Green', 'Red')
 
   
-    
+    itc_data['Sign Change'] = itc_data.apply(lambda row: check_sign_change(row), axis=1)
 
-    
+    pd.set_option('display.max_rows', None)
+    # pd.set_option('display.max_columns', None)
       
-   
+    slope_change_points = itc_data[itc_data['Sign Change']]
     
+    rows_with_sign_change = itc_data[itc_data['Sign Change']].index.to_numpy()
+    rows_with_sign_change[1:] -= 1
+    reversal_points = itc_data.iloc[rows_with_sign_change]
 
+    selected_columns_indices = [ 1,2,3,4,5,6,7,8,9,10,11,12,13]  # Replace with the indices of the columns you want to select
+    # print(reversal_points.iloc[:, selected_columns_indices].tail(30))
+
+   
+
+    delta = current_price - open_price
+
+    reversal_points = itc_data.iloc[rows_with_sign_change]
+    
+    df_maximums = get_max(reversal_points)
+    
+    imp_levels_max = merge_levels_up(df_maximums['Level'])
+
+    # print(imp_levels_max)
+
+    # plt.figure(figsize=(10, 6))
+    # # plt.plot(df_maximums['Date'], df_maximums['Maximums'], marker='o', label='Maximums')
+    # # plt.plot(df_minimums['Date'], df_minimums['Minimums'], marker='x', label='Minimums')
+    # plt.plot(itc_data['Date'], itc_data['Close'], marker='', label='Close')
+    # for level in imp_levels_max:
+    #     plt.axhline(y=level, linestyle='--', label=f'Level {level}')
+    # # for level in imp_levels_min:
+    # #     plt.axhline(y=level, linestyle=':', label=f'Level {level}')
+    # plt.title('Graph of Maximums Over Time')
+    # plt.xlabel('Date')
+    # plt.ylabel('Maximums')
+    # plt.legend()
+    # plt.grid(True)
+    # plt.show()
+
+    check_level_1(symbol, parso_price, previous_day_price, current_price, ma_20, ma_50, ma_200, delta, delta_high, delta_low, today_3_4, imp_levels_max)
     
 Shares = ' & '.join([' '.join(map(str, inner_list)) for inner_list in Stocks])
 # send_email('Swing Tip', Shares)
