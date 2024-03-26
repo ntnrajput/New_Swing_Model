@@ -1,0 +1,32 @@
+name: Run Colab Notebook
+
+on:
+  schedule:
+    - cron: '31 09 * * *'  # Schedule for 3:00 PM IST daily
+    #- cron: '45 10 * * *'  # Schedule for 3:00 PM IST daily
+
+jobs:
+  run-colab:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.x
+
+      - name: Install Dependencies
+        run: |
+          pip install -U -q pytz tzlocal
+          pip install -U -q yfinance
+          pip install -U -q matplotlib
+
+      - name: Set Timezone to IST
+        run: |
+          export TZ=Asia/Kolkata
+
+      - name: Run Colab Notebook
+        run: python Model_1.py  # Replace with your actual script path
