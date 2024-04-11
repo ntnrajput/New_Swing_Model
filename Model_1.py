@@ -14,7 +14,7 @@ def stock_symbols():
     nifty_200_symbols = ['AUBANK.BO','ITC.NS', 'TITAN.NS','TECHM.NS','RITES.NS','ULTRACEMCO.NS','MARUTI.NS','BAJFINANCE.NS','COALINDIA.NS',
                          'APOLLOHOSP.NS','HDFCLIFE.NS','MAHSEAMLES.NS','RELIANCE.NS','TCS.NS','HDFCBANK.NS','ICICIBANK.NS','INFY.NS',
                          'BHARTIARTL.NS','HINDUNILVR.NS','SBIN.NS','LICI.NS','HCLTECH.NS','KOTAKBANK.NS','ADANIENT.NS','AXISBANK.NS',
-                         'SUNPHARMA.NS','ASIANPAINT.NS','NTPC.NS','TATAMOTORS.NS','ONGC.NS','ADANIGREEN.NS','BAJAJFINSV.NS','ADANIPORTS.NS',
+                         'SUNPHARMA.NS','ASIANPAINT.NS','NTPC.NS','TATAMOTORS.NS','ADANIGREEN.NS','BAJAJFINSV.NS','ADANIPORTS.NS',
                          'DMART.NS','NESTLEIND.NS','WIPRO.NS','POWERGRID.NS','ADANIPOWER.NS','BAJAJ-AUTO.NS','M&M.NS','HAL.NS','DLF.NS',
                          'IOC.NS','LTIM.NS','TATASTEEL.NS','SIEMENS.NS','SBILIFE.NS','GRASIM.NS','PIDILITIND.NS','BEL.NS','HINDZINC.NS',
                          'PFC.NS','INDUSINDBK.NS','ADANIENSOL.NS','BRITANNIA.NS','HINDALCO.NS','ZOMATO.NS','BANKBARODA.NS','INDIGO.NS',
@@ -42,7 +42,7 @@ def stock_symbols():
                          'UNITDSPR.BO','GLAXO.BO','POONAWALLA.BO','VOLTAS.BO','UPL.BO','TATAINVEST.BO','CRISIL.BO','M&MFIN.BO','LICHSGFIN.BO',
                          'AIAENG.BO','3MINDIA.BO','JKCEMENT.BO','EMBASSY.BO','DELHIVERY.BO','BDL.BO','HONAUT.BO','STARHEALTH.BO','NAM-INDIA.BO',
                          'BIOCON.BO','APOLLOTYRE.BO','FORTIS.BO','BANDHANBNK.BO','NLCINDIA.BO','MFSL.BO','MSUMI.BO','ESCORTS.BO',
-                         'DEEPAKNTR.BO','METROBRAND.BO','KEI.BO','IGL.BO','IPCALAB.BO','DEEPAKNTR.BO','NATIONALUM.BO','MSUMI.BO',
+                         'METROBRAND.BO','KEI.BO','IGL.BO','IPCALAB.BO','DEEPAKNTR.BO','NATIONALUM.BO',
                          'LLOYDSME.BO','JUBLFOOD.BO','GLAND.BO','EXIDEIND.BO','POWERINDIA.BO','SYNGENE.BO','GODREJIND.BO','KIOCL.BO',
                          'BLUESTARCO.BO','KPRMILL.BO','ZFCVINDIA.BO','HINDCOPPER.BO','ITI.BO','GLENMARK.BO','EIHOTEL.BO','AJANTPHARM.BO',
                          'ENDURANCE.BO','ISEC.BO','HATSUN.BO','JBCHEPHARM.BO','BAYERCROP.BO','GET&D.BO','SUNTV.BO','APARINDS.BO','360ONE.BO',
@@ -52,7 +52,7 @@ def stock_symbols():
                          'BRIGADE.BO','PFIZER.BO','KAJARIACER.BO','IRCON.BO','EMAMILTD.BO','PEL.BO','APLLTD.BO','TRIDENT.BO','SANOFI.BO',
                          'RAMCOCEM.BO','FIVESTAR.BO','TIMKEN.BO','SIGNATURE.BO','RATNAMANI.BO','KEC.BO','CROMPTON.BO','BATAINDIA.BO','KAYNES.BO',
                          'DEVYANI.BO','IDFC.BO','ATUL.BO','JAIBALAJI.BO','MCX.BO','LALPATHLAB.BO','TVSHLTD.BO','SUMICHEM.BO','NATCOPHARM.BO',
-                         'KPIL.BO','NSLNISP.BO','PNBHOUSING.BO','SWANENERGY.BO','GODFRYPHLP.BO','CIEINDIA.BO','SUVENPHAR.BO','CELLO.BO',
+                         'KPIL.BO','NSLNISP.BO','PNBHOUSING.BO','SWANENERGY.BO','GODFRYPHLP.BO','CIEINDIA.BO','CELLO.BO',
                          'VINATIORGA.BO','KIMS.BO','SUVENPHAR.BO','REDINGTON.BO','INTELLECT.BO','WHIRLPOOL.BO',
                          'CENTURYTEX.BO','RRKABEL.BO','APTUS.BO','TTML.BO','PPLPHARMA.BO','ANANDRATHI.BO','INDIAMART.BO',
                          'JYOTHYLAB.BO','CESC.BO','SHYAMMETL.BO','ACE.BO','SCHNEIDER.BO','LAXMIMACH.BO','INOXWIND.BO',
@@ -259,7 +259,7 @@ def check_level_crossing(imp_levels_max,current_price,previous_day_price,parso_p
         lower_level = imp_levels_max[i+1]
         
 
-      if ((previous_day_price <  levels) and (current_price > levels)) or ((parso_price > previous_day_price) and (previous_day_price < 1.015* levels) and (current_price > levels)):
+      if ((previous_day_price <  levels) and (current_price > levels)) or ((parso_price > previous_day_price) and (previous_day_price < 1.015* levels) and (current_price > levels)) and((all_high > 1.1 * current_price )):
         if(current_price > ma_20 and current_price < 1.1 *ma_20) or (current_price > ma_50 and current_price < 1.1 *ma_50) or (current_price > ma_200 and current_price < 1.1 *ma_200):
             print("0","moving average giving support", symbol, 'for crossing', levels)
             Stocks.append([symbol,"ma support to price",levels])
