@@ -75,7 +75,7 @@ def stock_symbols():
                          'GLS.BO','USHAMART.BO','NETWORK18.BO']  # Replace with actual symbols
 
 
-    # nifty_200_symbols = ['ASHOKLEY.BO','AUBANK.BO']
+    # nifty_200_symbols = ['M&M.NS','BAJAJ-AUTO.NS']
 
     return nifty_200_symbols
 Stocks = []
@@ -223,8 +223,6 @@ def calculate_change_count_checks(change_counts):
     change_count_checks.append(False)
     return change_count_checks
 
-
-
 def check_pass_zero(share_history, stock_data):
     
     
@@ -242,31 +240,31 @@ def check_pass_zero(share_history, stock_data):
     if(current_price > previous_day_price and current_price > today_3_4 and delta_high > 0 and delta_low > 0 ):
        check_level_crossing(imp_levels_max,current_price,previous_day_price,parso_price,symbol,all_high,ma_20, ma_50, ma_200)
 
-
-
 def check_level_crossing(imp_levels_max,current_price,previous_day_price,parso_price,symbol,all_high,ma_20,ma_50,ma_200):
     global Stocks
 
     for i in range (len(imp_levels_max)-1):
-      near_high = 0
-      levels = imp_levels_max[i]
-      if i > 0 and i< (len(imp_levels_max)-1) :
-        nxt_level = imp_levels_max[i-1]
-        lower_level = imp_levels_max[i+1]
-      # if i == (len(imp_levels_max)-1):
-      if(i==0):
-        near_high = 1
-        lower_level = imp_levels_max[i+1]
-        
+        near_high = 0
+        levels = imp_levels_max[i]
+        if i > 0 and i< (len(imp_levels_max)-1) :
+            nxt_level = imp_levels_max[i-1]
+            lower_level = imp_levels_max[i+1]
+            # if i == (len(imp_levels_max)-1):
+            if(i==0):
+                near_high = 1
+                lower_level = imp_levels_max[i+1]
+                nxt_level = 1.05 * current_price
 
-      if ((previous_day_price <  levels) and (current_price > levels)) or ((parso_price > previous_day_price) and (previous_day_price < 1.015* levels) and (current_price > levels)) and((all_high > 1.1 * current_price )):
-        if(current_price > ma_20 and current_price < 1.1 *ma_20) or (current_price > ma_50 and current_price < 1.1 *ma_50) or (current_price > ma_200 and current_price < 1.1 *ma_200):
+        # price very close to ma20 or ma50 or ma200
+        if(current_price > ma_20 and current_price < 1.02 *ma_20) or (current_price > ma_50 and current_price < 1.02 *ma_50) or (current_price > ma_200 and current_price < 1.02 *ma_200):
             print("0","moving average giving support", symbol, 'for crossing', levels)
             Stocks.append([symbol,"ma support to price",levels])
 
-        if(ma_20 < 1.1 * ma_50) or ((ma_20 < 1.1 * ma_200)):
-            print("0","moving average taking support of other MA", symbol, 'for crossing', levels)
-            Stocks.append([symbol,"ma support to ma",levels])
+        # One Moving  average is very close to other
+        if ((previous_day_price <  levels) and (current_price > levels)) or ((parso_price > previous_day_price) and (previous_day_price < 1.015* levels) and (current_price > levels)) and((all_high > 1.1 * current_price )):
+            if(ma_20 < 1.03 * ma_50) or ((ma_20 < 1.03 * ma_200)) or ((ma_50 < 1.03 * ma_200)) :
+                print("0","moving average taking support of other MA", symbol, 'for crossing', levels)
+                Stocks.append([symbol,"ma support to ma",levels])
         
         if(current_price < 1.05 * ma_20 ) and (ma_20 > 1.10 * ma_50) and (levels < 1.01 * ma_20):
             print("1","time to Buy ma 20", symbol, 'for crossing', levels)
@@ -280,14 +278,11 @@ def check_level_crossing(imp_levels_max,current_price,previous_day_price,parso_p
             print(imp_levels_max)
             Stocks.append([symbol,"High",levels])
 
-        if (near_high == 0 ) and (nxt_level > 1.07*levels) and (lower_level > 0.95 * levels) and (nxt_level > 1.05 * current_price):
+        if (near_high == 0 ) and (nxt_level > 1.1*levels) and (lower_level > 0.95 * levels) and (nxt_level > 1.05 * current_price):
             print("3","time to Buy", symbol, 'for crossing', levels, 'next level:',nxt_level)
             print(imp_levels_max)
             Stocks.append([symbol,levels])
-
-    print(Stocks)
-
-
+    
     
 nifty_200_symbols = stock_symbols()
 # nifty_200_symbols = ['LT.NS']
@@ -339,10 +334,11 @@ for symbol in nifty_200_symbols:
     imp_levels_max = [round(level) for level in imp_levels_max]
     
     
-
     share_details = yf.Ticker(symbol)
     share_history = share_details.history()
     delta_today = share_history['Close'].iloc[-1] - share_history['Open'].iloc[-1]
+
+    # print(stock_data['Symbol'][0],imp_levels_max)
     
     if(ma_20 > ma_50 and ma_50 > ma_200 and delta_today > 0 ):
         check_pass_zero(share_history,stock_data)
@@ -351,5 +347,5 @@ for symbol in nifty_200_symbols:
         
 Shares = ' & '.join([' '.join(map(str, inner_list)) for inner_list in Stocks])
 print(Shares)
-send_email('New Swing Tip', Shares)
+# send_email('New Swing Tip', Shares)
 print('sab kar diya')
