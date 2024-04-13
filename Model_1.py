@@ -24,7 +24,7 @@ def stock_symbols():
                          'BAJAJHLDNG.BO','BALKRISHNA.BO','BANKINDIA.BO','BERGEPAINT.BO','BHARATFORG.BO','BHEL.BO','BOSCHLTD.BO','BPCL.BO',
                          'CANBK.BO','CGPOWER.BO','CHOLAFIN.BO','CIPLA.BO','COLPAL.BO','CONCOR.BO','CUMMINSIND.BO','DIVISLAB.BO','FACT.BO',
                          'DRREDDY.BO','EICHERMOT.BO','GICRE.BO','GMRINFRA.BO','HDFCAMC.BO','GODREJPROP.BO','HEROMOTOCO.BO','HINDALCO.BO',
-                         'HINDPETRO.BO','HINDUNILVR.BO','HINDZINC.BO','ICICIBANK.BO','ICICIGI.BO','IDBI.BO','IDEA.BO','IDFCFIRSTB.BO',
+                         'HINDPETRO.BO','HINDUNILVR.BO','HINDZINC.BO','ICICIBANK.BO','ICICIGI.BO','IDBI.BO','IDFCFIRSTB.BO',
                          'INDHOTEL.BO','INDIANB.BO','INDIGO.BO','INDUSINDBK.BO','INDUSTOWER.BO','IOB.BO','IRCTC.BO','IRFC.BO','JINDALSTEL.BO',
                          'JIOFIN.BO','JSWENERGY.BO','JSWSTEEL.BO','KOTAKBANK.BO','LICI.BO','LT.BO','LTIM.BO','LTTS.BO','LUPIN.BO','M&M.BO',
                          'MANKIND.BO','MARICO.BO','MAXHEALTH.BO','MOTHERSON.BO','MRF.BO','MUTHOOTFIN.BO','NAUKRI.BO','NESTLEIND.BO','NHPC.BO',
@@ -242,6 +242,7 @@ def check_pass_zero(share_history, stock_data):
 
 def check_level_crossing(imp_levels_max,current_price,previous_day_price,parso_price,symbol,all_high,ma_20,ma_50,ma_200):
     global Stocks
+    
 
     for i in range (len(imp_levels_max)-1):
         near_high = 0
@@ -250,10 +251,11 @@ def check_level_crossing(imp_levels_max,current_price,previous_day_price,parso_p
             nxt_level = imp_levels_max[i-1]
             lower_level = imp_levels_max[i+1]
             # if i == (len(imp_levels_max)-1):
-            if(i==0):
-                near_high = 1
-                lower_level = imp_levels_max[i+1]
-                nxt_level = 1.05 * current_price
+        if(i==0):
+            near_high = 1
+            lower_level = imp_levels_max[i+1]
+            nxt_level = all_high
+                
 
         # price very close to ma20 or ma50 or ma200
         if(current_price > ma_20 and current_price < 1.02 *ma_20) or (current_price > ma_50 and current_price < 1.02 *ma_50) or (current_price > ma_200 and current_price < 1.02 *ma_200):
