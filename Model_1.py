@@ -349,5 +349,5 @@ for symbol in nifty_200_symbols:
         
 Shares = ' & '.join([' '.join(map(str, inner_list)) for inner_list in Stocks])
 print(Shares)
-# send_email('New Swing Tip', Shares)
+send_email('New Swing Tip', Shares)
 print('sab kar diya')
