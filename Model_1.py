@@ -75,7 +75,7 @@ def stock_symbols():
                          'GLS.BO','USHAMART.BO','NETWORK18.BO']  # Replace with actual symbols
 
 
-    # nifty_200_symbols = ['M&M.NS','BAJAJ-AUTO.NS']
+    # nifty_200_symbols = [ 'TATAMOTORS.BO']
 
     return nifty_200_symbols
 Stocks = []
@@ -242,6 +242,10 @@ def check_pass_zero(share_history, stock_data):
 
 def check_level_crossing(imp_levels_max,current_price,previous_day_price,parso_price,symbol,all_high,ma_20,ma_50,ma_200):
     global Stocks
+
+    if(current_price > ma_20 and current_price < 1.02 *ma_20) or (current_price > ma_50 and current_price < 1.02 *ma_50) or (current_price > ma_200 and current_price < 1.02 *ma_200):
+            print("0","moving average giving support", symbol, 'for crossing', levels)
+            Stocks.append([symbol,"ma support to price",levels])
     
 
     for i in range (len(imp_levels_max)-1):
@@ -258,9 +262,7 @@ def check_level_crossing(imp_levels_max,current_price,previous_day_price,parso_p
                 
 
         # price very close to ma20 or ma50 or ma200
-        if(current_price > ma_20 and current_price < 1.02 *ma_20) or (current_price > ma_50 and current_price < 1.02 *ma_50) or (current_price > ma_200 and current_price < 1.02 *ma_200):
-            print("0","moving average giving support", symbol, 'for crossing', levels)
-            Stocks.append([symbol,"ma support to price",levels])
+        
 
         # One Moving  average is very close to other
         if ((previous_day_price <  levels) and (current_price > levels)) or ((parso_price > previous_day_price) and (previous_day_price < 1.015* levels) and (current_price > levels)) and((all_high > 1.1 * current_price )):
