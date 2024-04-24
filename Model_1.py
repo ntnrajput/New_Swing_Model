@@ -244,8 +244,8 @@ def check_level_crossing(imp_levels_max,current_price,previous_day_price,parso_p
     global Stocks
 
     if(current_price > ma_20 and current_price < 1.02 *ma_20) or (current_price > ma_50 and current_price < 1.02 *ma_50) or (current_price > ma_200 and current_price < 1.02 *ma_200):
-            print("0","moving average giving support", symbol, 'for crossing', levels)
-            Stocks.append([symbol,"ma support to price",levels])
+            print("0","moving average giving support", symbol)
+            Stocks.append([symbol,"ma support to price"])
     
 
     for i in range (len(imp_levels_max)-1):
