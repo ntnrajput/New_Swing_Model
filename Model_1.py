@@ -243,7 +243,7 @@ def check_pass_zero(share_history, stock_data):
 def check_level_crossing(imp_levels_max,current_price,previous_day_price,parso_price,symbol,all_high,ma_20,ma_50,ma_200):
     global Stocks
 
-    if(current_price > ma_20 and current_price < 1.02 *ma_20) or (current_price > ma_50 and current_price < 1.02 *ma_50) or (current_price > ma_200 and current_price < 1.02 *ma_200):
+    if(current_price > ma_20 and current_price < 1.02 *ma_20 and ma_20 < 1.02 * ma_50) or (current_price > ma_50 and current_price < 1.02 *ma_50 and ((ma_50 < 1.02 * ma_200 ))) or (current_price > ma_200 and current_price < 1.02 *ma_200):
             print("0","moving average giving support", symbol)
             Stocks.append([symbol,"ma support to price"])
     
@@ -266,26 +266,25 @@ def check_level_crossing(imp_levels_max,current_price,previous_day_price,parso_p
 
         # One Moving  average is very close to other
         if ((previous_day_price <  levels) and (current_price > levels)) or ((parso_price > previous_day_price) and (previous_day_price < 1.015* levels) and (current_price > levels)) and((all_high > 1.1 * current_price )):
-            if(ma_20 < 1.03 * ma_50) or ((ma_20 < 1.03 * ma_200)) or ((ma_50 < 1.03 * ma_200)) :
-                print("0","moving average taking support of other MA", symbol, 'for crossing', levels)
-                Stocks.append([symbol,"ma support to ma",levels])
+           
         
-        if(current_price < 1.05 * ma_20 ) and (ma_20 > 1.10 * ma_50) and (levels < 1.01 * ma_20):
-            print("1","time to Buy ma 20", symbol, 'for crossing', levels)
-            print('symbol',symbol,parso_price,previous_day_price,current_price)
-            print(imp_levels_max)
-            Stocks.append([symbol,"ma 20",levels])
+            if(current_price < 1.05 * ma_20 ) and (ma_20 > 1.10 * ma_50) and (levels < 1.01 * ma_20):
+                print("1","time to Buy ma 20", symbol, 'for crossing', levels)
+                print('symbol',symbol,parso_price,previous_day_price,current_price)
+                print(imp_levels_max)
+                Stocks.append([symbol,"ma 20",levels])
 
-        if (near_high == 1) and (current_price < 1.02 * levels) and (all_high > 1.09  * current_price)  :
-            print(all_high)
-            print("2","time to Buy  near high", symbol, 'for crossing', levels)
-            print(imp_levels_max)
-            Stocks.append([symbol,"High",levels])
+            if (near_high == 1) and (current_price < 1.02 * levels) and (all_high > 1.09  * current_price)  :
+                print(all_high)
+                print("2","time to Buy  near high", symbol, 'for crossing', levels)
+                print(imp_levels_max)
+                Stocks.append([symbol,"High",levels])
 
-        if (near_high == 0 ) and (nxt_level > 1.1*levels) and (lower_level > 0.95 * levels) and (nxt_level > 1.05 * current_price):
-            print("3","time to Buy", symbol, 'for crossing', levels, 'next level:',nxt_level)
-            print(imp_levels_max)
-            Stocks.append([symbol,levels])
+            if (near_high == 0 ) and (nxt_level > 1.1*levels) and (lower_level > 0.95 * levels) and (nxt_level > 1.05 * current_price):
+                if(ma_20 > ma_50 and ma_20 < 1.1*ma_50):
+                    print("3","time to Buy", symbol, 'for crossing', levels, 'next level:',nxt_level)   
+                    print(imp_levels_max)
+                    Stocks.append([symbol,levels])
     
     
 nifty_200_symbols = stock_symbols()
