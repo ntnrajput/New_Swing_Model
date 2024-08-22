@@ -26,6 +26,7 @@ for symbol in nifty_200_symbols:
     except Exception as e:
         print(f"Error fetching data for {symbol}: {e}")
 
+print(nifty_200_data)
 
 for symbol in nifty_200_symbols:
     stock_data = nifty_200_data[nifty_200_data['Symbol'] == symbol]
