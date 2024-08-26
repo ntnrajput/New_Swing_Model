@@ -25,7 +25,7 @@ def stock_symbols():
     #                      'ASTRAL.NS','JSL.NS','JSWINFRA.NS','MUTHOOTFIN.NS','TATACOMM.NS','PHOENIXLTD.BO','MPHASIS.NS','FACT.NS','ACC.NS',
     #                      'SUPREMEIND.NS','AWL.NS','PRESTIGE.NS','TATAELXSI.NS','SJVN.NS','LINDEINDIA.NS','TATATECH.NS','POLICYBZR.BO',
     #                      'SUNDARMFIN.BO','NIACL.BO','SCHAEFFLER.BO','UBL.BO','BALKRISIND.BO','PSB.BO','MRPL.BO','MAHABANK.BO','NYKAA.BO',
-    #                      'PETRONET.BO','KPITTECH.BO','L&TFH.BO','IREDA.BO','MAZDOCK.BO','THERMAX.BO','COFORGE.BO','DIXON.BO','IRB.BO',
+    #                      'PETRONET.BO','KPITTECH.BO','IREDA.BO','MAZDOCK.BO','THERMAX.BO','COFORGE.BO','DIXON.BO','IRB.BO',
     #                      'HUDCO.BO','DALBHARAT.BO','MEDANTA.BO','KALYANKJIL.BO','GUJGASLTD.BO','UNOMINDA.BO','FEDERALBNK.BO',
     #                      'UNITDSPR.BO','GLAXO.BO','POONAWALLA.BO','VOLTAS.BO','UPL.BO','TATAINVEST.BO','CRISIL.BO','M&MFIN.BO','LICHSGFIN.BO',
     #                      'AIAENG.BO','3MINDIA.BO','JKCEMENT.BO','EMBASSY.BO','DELHIVERY.BO','BDL.BO','HONAUT.BO','STARHEALTH.BO','NAM-INDIA.BO',
@@ -63,6 +63,6 @@ def stock_symbols():
     #                      'GLS.BO','USHAMART.BO','NETWORK18.BO']  # Replace with actual symbols
 
 
-    nifty_200_symbols = ['NETWORK18.BO','AUBANK.BO']
+    nifty_200_symbols = ['NETWORK18.BO','AUBANK.BO','USHAMART.BO','RVNL.BO']
 
     return nifty_200_symbols
